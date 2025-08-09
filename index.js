@@ -12,12 +12,27 @@ const client = new Client({
   ]
 });
 
-// prêt
+// ✅ Démarrage + statut rotatif
 client.once('ready', () => {
   console.log(`✅ Connecté en tant que ${client.user.tag}`);
+
+  const statuses = [
+    "📹 Caméra d’entrée — 100% opérationnelle",
+    "🤖 Surveillance automatique 24/7",
+    "🔒 Sécurité & accueil garantis pour tous"
+  ];
+
+  let i = 0;
+  setInterval(() => {
+    client.user.setPresence({
+      activities: [{ name: statuses[i], type: 3 }], // 3 = "Regarde"
+      status: "online"
+    });
+    i = (i + 1) % statuses.length;
+  }, 10000);
 });
 
-// quand quelqu’un rejoint
+// 👋 Bienvenue auto avec logo dans le salon WELCOME_CHANNEL_ID
 client.on('guildMemberAdd', async (member) => {
   try {
     const channelId = process.env.WELCOME_CHANNEL_ID;
@@ -27,8 +42,8 @@ client.on('guildMemberAdd', async (member) => {
     if (!channel) return console.log("⚠️ Salon welcome introuvable. Vérifie WELCOME_CHANNEL_ID");
 
     const embed = new EmbedBuilder()
-      .setColor(0xFF7A00) // orange style prison
-      .setImage(logoUrl)  // logo affiché en grand en haut
+      .setColor(0xFF7A00)
+      .setImage(logoUrl)  // logo en grand au-dessus
       .setTitle(`👋 Bienvenue, ${member.user.username} !`)
       .setDescription(`Ravi de t’avoir sur **CellBlock RP** 🔒`)
       .setThumbnail(member.user.displayAvatarURL({ extension: 'png', size: 256 }))
