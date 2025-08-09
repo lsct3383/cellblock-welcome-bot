@@ -32,18 +32,32 @@ client.once('ready', () => {
   }, 10000);
 });
 
-// 👋 Bienvenue auto avec logo dans le salon WELCOME_CHANNEL_ID
+// 👋 Bienvenue auto + auto‑rôle "Attente de jugement"
 client.on('guildMemberAdd', async (member) => {
   try {
     const channelId = process.env.WELCOME_CHANNEL_ID;
     const logoUrl   = process.env.SERVER_LOGO_URL;
 
+    // --- AUTO‑RÔLE ---
+    const roleId = process.env.ROLE_PENDING_ID; // <= ajoute cette variable dans Railway
+    if (roleId) {
+      try {
+        await member.roles.add(roleId);
+        console.log(`✅ Rôle 'Attente de jugement' ajouté à ${member.user.tag}`);
+      } catch (err) {
+        console.error('❌ Impossible d’ajouter le rôle (hiérarchie/permissions) :', err.message);
+      }
+    } else {
+      console.warn('⚠️ ROLE_PENDING_ID non défini dans les variables.');
+    }
+
+    // --- MESSAGE DE BIENVENUE ---
     const channel = await member.guild.channels.fetch(channelId).catch(() => null);
     if (!channel) return console.log("⚠️ Salon welcome introuvable. Vérifie WELCOME_CHANNEL_ID");
 
     const embed = new EmbedBuilder()
       .setColor(0xFF7A00)
-      .setImage(logoUrl)  // logo en grand au-dessus
+      .setImage(logoUrl)
       .setTitle(`👋 Bienvenue, ${member.user.username} !`)
       .setDescription(`Ravi de t’avoir sur **CellBlock RP** 🔒`)
       .setThumbnail(member.user.displayAvatarURL({ extension: 'png', size: 256 }))
